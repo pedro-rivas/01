@@ -29,7 +29,12 @@ async function main() {
     //     bathromms: 1,
     //   },
     // ]);
-    await findOneListingByName(client, "zacatecas");
+    ///await findOneListingByName(client, "zacatecas");
+    await findListingsWithMinimumBedroomsBathroomsAndMostRecentReviews(client, {
+      minimumNumberOfBedrooms: 6,
+      minimumNumberOfBathrooms: 5,
+      maximumNumberOfResults: 2,
+    });
   } catch (e) {
     console.error(e);
   } finally {
@@ -83,5 +88,53 @@ async function findOneListingByName(client, name) {
     console.log(result);
   } else {
     console.log("no result");
+  }
+}
+
+/**
+ * FIND
+ */
+
+async function findListingsWithMinimumBedroomsBathroomsAndMostRecentReviews(
+  client,
+  {
+    minimumNumberOfBedrooms = 0,
+    minimumNumberOfBathrooms = 0,
+    maximumNumberOfResults = Number.MAX_SAFE_INTEGER,
+  } = {}
+) {
+  // See https://mongodb.github.io/node-mongodb-native/3.6/api/Collection.html#find for the find() docs
+  const cursor = client
+    .db("sample_airbnb")
+    .collection("listingsAndReviews")
+    .find({
+      bedrooms: { $gte: minimumNumberOfBedrooms },
+      bathrooms: { $gte: minimumNumberOfBathrooms },
+    })
+    .sort({ last_review: -1 })
+    .limit(maximumNumberOfResults);
+
+  // Store the results in an array
+  const results = await cursor.toArray();
+
+  // Print the results
+  if (results.length > 0) {
+    console.log(
+      `Found listing(s) with at least ${minimumNumberOfBedrooms} bedrooms and ${minimumNumberOfBathrooms} bathrooms:`
+    );
+    results.forEach((result, i) => {
+      const date = new Date(result.last_review).toDateString();
+
+      console.log();
+      console.log(`${i + 1}. name: ${result.name}`);
+      console.log(`   _id: ${result._id}`);
+      console.log(`   bedrooms: ${result.bedrooms}`);
+      console.log(`   bathrooms: ${result.bathrooms}`);
+      console.log(`   most recent review date: ${date}`);
+    });
+  } else {
+    console.log(
+      `No listings found with at least ${minimumNumberOfBedrooms} bedrooms and ${minimumNumberOfBathrooms} bathrooms`
+    );
   }
 }
