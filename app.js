@@ -8,7 +8,13 @@ async function main() {
 
   try {
     await client.connect();
-    await listDatabases(client);
+    //await listDatabases(client);
+    await createListing(client, {
+      name: "CUCEA",
+      summary: "es universidad",
+      bedrooms: 5,
+      bathromms: 2,
+    });
   } catch (e) {
     console.error(e);
   } finally {
@@ -21,4 +27,13 @@ main().catch(console.error);
 async function listDatabases(client) {
   let databasesList = await client.db().admin().listDatabases();
   console.log("Databases:");
+}
+
+async function createListing(client, newListing) {
+  const result = await client
+    .db("sample_airbnb")
+    .collection("listingAndReviews")
+    .insertOne(newListing);
+
+  console.log(result);
 }
