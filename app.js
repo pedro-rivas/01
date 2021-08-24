@@ -35,9 +35,15 @@ async function main() {
     //   minimumNumberOfBathrooms: 5,
     //   maximumNumberOfResults: 2,
     // });
-    await updateListingByName(client, "Horto flat with small garden", {
-      bedrooms: 10,
-      beds: 10,
+    // await updateListingByName(client, "Horto flat with small garden", {
+    //   bedrooms: 10,
+    //   beds: 10,
+    // });
+
+    await upsertListingByName(client, "TEUL", {
+      name: "Cozy Cottage",
+      bedrooms: 2,
+      bathrooms: 1,
     });
   } catch (e) {
     console.error(e);
@@ -156,4 +162,30 @@ async function updateListingByName(client, nameOfListing, updatedListing) {
 
   console.log(`${result.matchedCount} document(s) matched the query criteria.`);
   console.log(`${result.modifiedCount} document(s) was/were updated.`);
+}
+
+/**
+ * UPSERT
+ */
+
+async function upsertListingByName(client, nameOfListing, updatedListing) {
+  // See https://mongodb.github.io/node-mongodb-native/3.6/api/Collection.html#updateOne for the updateOne() docs
+  const result = await client
+    .db("sample_airbnb")
+    .collection("listingAndReviews")
+    .updateOne(
+      { name: nameOfListing },
+      { $set: updatedListing },
+      { upsert: true }
+    );
+
+  console.log(`${result.matchedCount} document(s) matched the query criteria.`);
+
+  if (result.upsertedCount > 0) {
+    console.log(
+      `One document was inserted with the id ${result.upsertedId._id}`
+    );
+  } else {
+    console.log(`${result.modifiedCount} document(s) was/were updated.`);
+  }
 }
