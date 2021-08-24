@@ -29,6 +29,9 @@ async function listDatabases(client) {
   console.log("Databases:");
 }
 
+/**
+ * INSERT ONE
+ */
 async function createListing(client, newListing) {
   const result = await client
     .db("sample_airbnb")
