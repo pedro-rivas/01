@@ -47,6 +47,8 @@ async function main() {
     // });
 
     await deleteListingByName(client, "Test name");
+
+    await deleteListingsScrapedBeforeDate(client, "CUCEA");
   } catch (e) {
     console.error(e);
   } finally {
@@ -202,5 +204,18 @@ async function deleteListingByName(client, nameOfListing) {
     .db("sample_airbnb")
     .collection("listingAndReviews")
     .deleteOne({ name: nameOfListing });
+  console.log(`${result.deletedCount} document(s) was/were deleted.`);
+}
+
+/**
+ * DELETE MANY
+ */
+
+async function deleteListingsScrapedBeforeDate(client, nameOfListing) {
+  // See https://mongodb.github.io/node-mongodb-native/3.6/api/Collection.html#deleteMany for the deleteMany() docs
+  const result = await client
+    .db("sample_airbnb")
+    .collection("listingAndReviews")
+    .deleteMany({ name: nameOfListing });
   console.log(`${result.deletedCount} document(s) was/were deleted.`);
 }
