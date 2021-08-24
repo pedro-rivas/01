@@ -30,10 +30,14 @@ async function main() {
     //   },
     // ]);
     ///await findOneListingByName(client, "zacatecas");
-    await findListingsWithMinimumBedroomsBathroomsAndMostRecentReviews(client, {
-      minimumNumberOfBedrooms: 6,
-      minimumNumberOfBathrooms: 5,
-      maximumNumberOfResults: 2,
+    // await findListingsWithMinimumBedroomsBathroomsAndMostRecentReviews(client, {
+    //   minimumNumberOfBedrooms: 6,
+    //   minimumNumberOfBathrooms: 5,
+    //   maximumNumberOfResults: 2,
+    // });
+    await updateListingByName(client, "Horto flat with small garden", {
+      bedrooms: 10,
+      beds: 10,
     });
   } catch (e) {
     console.error(e);
@@ -137,4 +141,19 @@ async function findListingsWithMinimumBedroomsBathroomsAndMostRecentReviews(
       `No listings found with at least ${minimumNumberOfBedrooms} bedrooms and ${minimumNumberOfBathrooms} bathrooms`
     );
   }
+}
+
+/**
+ * UPDATE ONE
+ */
+
+async function updateListingByName(client, nameOfListing, updatedListing) {
+  // See https://mongodb.github.io/node-mongodb-native/3.6/api/Collection.html#updateOne for the updateOne() docs
+  const result = await client
+    .db("sample_airbnb")
+    .collection("listingsAndReviews")
+    .updateOne({ name: nameOfListing }, { $set: updatedListing });
+
+  console.log(`${result.matchedCount} document(s) matched the query criteria.`);
+  console.log(`${result.modifiedCount} document(s) was/were updated.`);
 }
