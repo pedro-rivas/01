@@ -40,11 +40,13 @@ async function main() {
     //   beds: 10,
     // });
 
-    await upsertListingByName(client, "TEUL", {
-      name: "Cozy Cottage",
-      bedrooms: 2,
-      bathrooms: 1,
-    });
+    // await upsertListingByName(client, "TEUL", {
+    //   name: "Cozy Cottage",
+    //   bedrooms: 2,
+    //   bathrooms: 1,
+    // });
+
+    await deleteListingByName(client, "Test name");
   } catch (e) {
     console.error(e);
   } finally {
@@ -188,4 +190,17 @@ async function upsertListingByName(client, nameOfListing, updatedListing) {
   } else {
     console.log(`${result.modifiedCount} document(s) was/were updated.`);
   }
+}
+
+/**
+ * DELETE ONE
+ */
+
+async function deleteListingByName(client, nameOfListing) {
+  // See https://mongodb.github.io/node-mongodb-native/3.6/api/Collection.html#deleteOne for the deleteOne() docs
+  const result = await client
+    .db("sample_airbnb")
+    .collection("listingAndReviews")
+    .deleteOne({ name: nameOfListing });
+  console.log(`${result.deletedCount} document(s) was/were deleted.`);
 }
