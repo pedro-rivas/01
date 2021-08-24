@@ -9,12 +9,26 @@ async function main() {
   try {
     await client.connect();
     //await listDatabases(client);
-    await createListing(client, {
-      name: "CUCEA",
-      summary: "es universidad",
-      bedrooms: 5,
-      bathromms: 2,
-    });
+    // await createListing(client, {
+    //   name: "CUCEA",
+    //   summary: "es universidad",
+    //   bedrooms: 5,
+    //   bathromms: 2,
+    // });
+    await createMultipleListings(client, [
+      {
+        name: "Test name 02",
+        summary: "adcdf 02",
+        bedrooms: 1,
+        bathromms: 1,
+      },
+      {
+        name: "Test name 03",
+        summary: "adcdf 03",
+        bedrooms: 1,
+        bathromms: 1,
+      },
+    ]);
   } catch (e) {
     console.error(e);
   } finally {
@@ -39,4 +53,18 @@ async function createListing(client, newListing) {
     .insertOne(newListing);
 
   console.log(result);
+}
+
+/**
+ * INSERT MANY
+ */
+
+async function createMultipleListings(client, newListings) {
+  const result = await client
+    .db("sample_airbnb")
+    .collection("listingAndReviews")
+    .insertMany(newListings);
+
+  console.log(`n: ${result.insertedCount}`);
+  console.log(result.insertedIds);
 }
