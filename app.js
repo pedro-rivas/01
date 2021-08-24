@@ -46,9 +46,11 @@ async function main() {
     //   bathrooms: 1,
     // });
 
-    await deleteListingByName(client, "Test name");
+    //await deleteListingByName(client, "Test name");
 
-    await deleteListingsScrapedBeforeDate(client, "CUCEA");
+    //await deleteListingsScrapedBeforeDate(client, "CUCEA");
+
+    await printCheapestSuburbs(client, "Australia", "Sydney", 5);
   } catch (e) {
     console.error(e);
   } finally {
@@ -218,4 +220,51 @@ async function deleteListingsScrapedBeforeDate(client, nameOfListing) {
     .collection("listingAndReviews")
     .deleteMany({ name: nameOfListing });
   console.log(`${result.deletedCount} document(s) was/were deleted.`);
+}
+
+/**
+ * AGREGATION
+ */
+
+async function printCheapestSuburbs(client, country, market, maxNumberToPrint) {
+  const pipeline = [
+    {
+      $match: {
+        bedrooms: 1,
+        "address.country": country,
+        "address.market": market,
+        "address.suburb": {
+          $exists: 1,
+          $ne: "",
+        },
+        room_type: "Entire home/apt",
+      },
+    },
+    {
+      $group: {
+        _id: "$address.suburb",
+        averagePrice: {
+          $avg: "$price",
+        },
+      },
+    },
+    {
+      $sort: {
+        averagePrice: 1,
+      },
+    },
+    {
+      $limit: maxNumberToPrint,
+    },
+  ];
+
+  // See https://mongodb.github.io/node-mongodb-native/3.6/api/Collection.html#aggregate for the aggregate() docs
+  const aggCursor = client
+    .db("sample_airbnb")
+    .collection("listingsAndReviews")
+    .aggregate(pipeline);
+
+  await aggCursor.forEach((airbnbListing) => {
+    console.log(`${airbnbListing._id}: ${airbnbListing.averagePrice}`);
+  });
 }
