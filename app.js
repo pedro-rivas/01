@@ -15,20 +15,21 @@ async function main() {
     //   bedrooms: 5,
     //   bathromms: 2,
     // });
-    await createMultipleListings(client, [
-      {
-        name: "Test name 02",
-        summary: "adcdf 02",
-        bedrooms: 1,
-        bathromms: 1,
-      },
-      {
-        name: "Test name 03",
-        summary: "adcdf 03",
-        bedrooms: 1,
-        bathromms: 1,
-      },
-    ]);
+    // await createMultipleListings(client, [
+    //   {
+    //     name: "aula 02",
+    //     summary: "des 01",
+    //     bedrooms: 1,
+    //     bathromms: 1,
+    //   },
+    //   {
+    //     name: "aula 03",
+    //     summary: "des 02",
+    //     bedrooms: 1,
+    //     bathromms: 1,
+    //   },
+    // ]);
+    await findOneListingByName(client, "zacatecas");
   } catch (e) {
     console.error(e);
   } finally {
@@ -58,7 +59,6 @@ async function createListing(client, newListing) {
 /**
  * INSERT MANY
  */
-
 async function createMultipleListings(client, newListings) {
   const result = await client
     .db("sample_airbnb")
@@ -67,4 +67,21 @@ async function createMultipleListings(client, newListings) {
 
   console.log(`n: ${result.insertedCount}`);
   console.log(result.insertedIds);
+}
+
+/**
+ * FIND ONE
+ */
+
+async function findOneListingByName(client, name) {
+  const result = await client
+    .db("sample_airbnb")
+    .collection("listingAndReviews")
+    .findOne({ name });
+
+  if (result) {
+    console.log(result);
+  } else {
+    console.log("no result");
+  }
 }
